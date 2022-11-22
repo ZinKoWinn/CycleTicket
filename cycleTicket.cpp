@@ -9,6 +9,7 @@
 #include "iomanip"
 
 using namespace Ticket;
+using namespace std;
 
 void CycleTicket::mainMenu() {
     CycleTicket cycleTicket;
@@ -92,39 +93,39 @@ void CycleTicket::showAvailableTickets() {
         printf("File opening error");
         exit(1);
     }
-    string luckyNumber = "";
-    string tempLuckyNumber = "";
+    string ticketNumber = "";
+    string tempTicketNumber = "";
     int index = 1;
     while (!file.eof()) {
-        file >> tempLuckyNumber;
+        file >> tempTicketNumber;
         if (index % 20 == 0) {
-            luckyNumber += tempLuckyNumber + "\n";
+            ticketNumber += tempTicketNumber + "\n";
         } else {
-            luckyNumber += tempLuckyNumber + " ";
+            ticketNumber += tempTicketNumber + " ";
         }
-        tempLuckyNumber = "";
+        tempTicketNumber = "";
         index++;
     }
-    cout << luckyNumber << endl << endl;
+    cout << ticketNumber << endl << endl;
     file.close();
 }
 
 int CycleTicket::isAvailableTicketNumber(string ticketNumber) {
     fstream file;
-    int luckyNumberIndex = 1;
+    int ticketNumberIndex = 1;
     file.open("available_tickets.txt", ios::in);
 
     if (!file.is_open()) {
         printf("File opening error");
         exit(1);
     }
-    string tempLuckyNumber = "";
+    string tempTicketNumber = "";
     while (!file.eof()) {
-        file >> tempLuckyNumber;
-        if (tempLuckyNumber == ticketNumber) {
-            return luckyNumberIndex;
+        file >> tempTicketNumber;
+        if (tempTicketNumber == ticketNumber) {
+            return ticketNumberIndex;
         }
-        luckyNumberIndex++;
+        ticketNumberIndex++;
     }
     file.close();
     return -1;
@@ -132,11 +133,10 @@ int CycleTicket::isAvailableTicketNumber(string ticketNumber) {
 
 void CycleTicket::buyTicket() {
     TicketSaleDetail ticketSaleDetail;
-    string tempLuckyNumber = "";
+    string tempTicketNumber = "";
     string ticketNumberIndex = "";
-    string tempTicketNumberIndex = "";
     int ticketCount = 0;
-    string isValidLuckyNumbers;
+    string isValidTicketNumbers;
     do {
         cout << "Enter ticket number : ";
         cin >> ticketSaleDetail.ticketNumbers;
@@ -146,31 +146,31 @@ void CycleTicket::buyTicket() {
         } else {
             for (auto &ch: ticketSaleDetail.ticketNumbers + ",") {
                 if (ch == ',') {
-                    int luckyNumberIndex = isAvailableTicketNumber(tempLuckyNumber);
-                    if (luckyNumberIndex != -1) {
-                        ticketNumberIndex += to_string(luckyNumberIndex) + ",";
-                        isValidLuckyNumbers += "1";
+                    int tempTicketNumberIndex = isAvailableTicketNumber(tempTicketNumber);
+                    if (tempTicketNumberIndex != -1) {
+                        ticketNumberIndex += to_string(tempTicketNumberIndex) + ",";
+                        isValidTicketNumbers += "1";
                         ticketCount++;
                     } else {
-                        isValidLuckyNumbers += "0";
-                        cout << endl << "Ticket Number " + tempLuckyNumber + " is not available." << endl;
+                        isValidTicketNumbers += "0";
+                        cout << endl << "Ticket Number " + tempTicketNumber + " is not available." << endl;
                     }
-                    tempLuckyNumber = "";
+                    tempTicketNumber = "";
                 } else {
                     string st(1, ch);
-                    tempLuckyNumber += st;
+                    tempTicketNumber += st;
                 }
             }
         }
     } while (ticketSaleDetail.ticketNumbers == "" || ticketSaleDetail.ticketNumbers.length() < 4);
 
-    replaceAll(isValidLuckyNumbers, "1", "");
+    replaceAll(isValidTicketNumbers, "1", "");
     int totalPrice = TICKET_PRICE * ticketCount;
 
-    if (isValidLuckyNumbers == "") {
+    if (isValidTicketNumbers == "") {
         cout << endl;
         cout << "Enter Name : ";
-        cin >> ticketSaleDetail.userName;
+        cin >> ticketSaleDetail.name;
         cout << "Enter Phone Number : ";
         cin >> ticketSaleDetail.phoneNumber;
         cout << "Enter Address : ";
@@ -266,7 +266,7 @@ void CycleTicket::save(TicketSaleDetail saleDetail) {
         exit(1);
     }
 
-    file << saleDetail.userName << ' ' << saleDetail.phoneNumber << ' ' << saleDetail.address << ' '
+    file << saleDetail.name << ' ' << saleDetail.phoneNumber << ' ' << saleDetail.address << ' '
          << saleDetail.ticketNumbers << ' ' << saleDetail.fees << '\n';
 
 
@@ -300,17 +300,17 @@ void CycleTicket::showTicketSaleDetails() {
     }
 
     while (!file.eof()) {
-        file >> ticketSaleDetail.userName >> ticketSaleDetail.phoneNumber >> ticketSaleDetail.address
+        file >> ticketSaleDetail.name >> ticketSaleDetail.phoneNumber >> ticketSaleDetail.address
              >> ticketSaleDetail.ticketNumbers >> ticketSaleDetail.fees;
 
-        ticketSaleDetailPtr = ticketSaleDetail.userName == "" ? NULL : &ticketSaleDetail;
+        ticketSaleDetailPtr = ticketSaleDetail.name == "" ? NULL : &ticketSaleDetail;
 
         if (ticketSaleDetailPtr != NULL) {
-            if (ticketSaleDetail.userName == "") {
+            if (ticketSaleDetail.name == "") {
                 cout << "There is no sale detail data." << endl << endl;
             } else {
                 showData(*ticketSaleDetailPtr);
-                ticketSaleDetail.userName = "";
+                ticketSaleDetail.name = "";
                 ticketSaleDetail.phoneNumber = "";
                 ticketSaleDetail.address = "";
                 ticketSaleDetail.ticketNumbers = "";
@@ -332,23 +332,23 @@ TicketSaleDetail *CycleTicket::findTicketOwner(string ticketNumber) {
             printf("File opening error");
             exit(1);
         }
-        string tempLuckyNumber = "";
+        string tempTicketNumber = "";
 
         while (!file.eof()) {
-            file >> ticketSaleDetail.userName >> ticketSaleDetail.phoneNumber >> ticketSaleDetail.address
+            file >> ticketSaleDetail.name >> ticketSaleDetail.phoneNumber >> ticketSaleDetail.address
                  >> ticketSaleDetail.ticketNumbers >> ticketSaleDetail.fees;
             for (auto &ch: ticketSaleDetail.ticketNumbers + ",") {
                 if (ch == ',') {
-                    if (tempLuckyNumber == ticketNumber) {
+                    if (tempTicketNumber == ticketNumber) {
                         return &ticketSaleDetail;
                     }
-                    tempLuckyNumber = "";
+                    tempTicketNumber = "";
                 } else {
                     string st(1, ch);
-                    tempLuckyNumber += st;
+                    tempTicketNumber += st;
                 }
             }
-            cout << tempLuckyNumber << endl;
+            cout << tempTicketNumber << endl;
         }
         file.close();
     }
@@ -360,10 +360,10 @@ void CycleTicket::ticketWinner() {
     cout << "TICKET WINNER" << endl;
     cout << "***********************" << endl << endl;
 
-    string luckyNumber = "";
+    string ticketNumber = "";
     cout << "Enter ticket number : ";
-    cin >> luckyNumber;
-    TicketSaleDetail *ticketSaleDetail = findTicketOwner(luckyNumber);
+    cin >> ticketNumber;
+    TicketSaleDetail *ticketSaleDetail = findTicketOwner(ticketNumber);
     if (ticketSaleDetail != NULL) {
         showData(*ticketSaleDetail);
     } else {
@@ -373,7 +373,7 @@ void CycleTicket::ticketWinner() {
 
 void CycleTicket::showData(TicketSaleDetail ticketSaleDetail) {
     cout << endl;
-    cout << "Name : " << ticketSaleDetail.userName << endl;
+    cout << "Name : " << ticketSaleDetail.name << endl;
     cout << "Phone Number : " << ticketSaleDetail.phoneNumber << endl;
     cout << "Address : " << ticketSaleDetail.address << endl;
     cout << "Ticket Numbers : " << ticketSaleDetail.ticketNumbers << endl;

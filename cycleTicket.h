@@ -6,13 +6,11 @@
 
 #define TICKET_PRICE 4000
 
-using namespace std;
-
 struct TicketSaleDetail {
-    string userName;
-    string phoneNumber;
-    string address;
-    string ticketNumbers;
+    std::string name;
+    std::string phoneNumber;
+    std::string address;
+    std::string ticketNumbers;
     int fees = 0;
 };
 
@@ -27,19 +25,19 @@ namespace Ticket {
 
         void showAvailableTickets();
 
-        int isAvailableTicketNumber(string ticketNumber);
+        int isAvailableTicketNumber(std::string ticketNumber);
 
         void buyTicket();
 
-        void updateAvailableTicket(string ticketNumbers);
+        void updateAvailableTicket(std::string ticketNumbers);
 
-        void replaceAll(string &str, const string &oldValue, const string &newValue);
+        void replaceAll(std::string &str, const std::string &oldValue, const std::string &newValue);
 
         void save(TicketSaleDetail saleDetail);
 
         void showTicketSaleDetails();
 
-        TicketSaleDetail *findTicketOwner(string ticketNumber);
+        TicketSaleDetail *findTicketOwner(std::string ticketNumber);
 
         void ticketWinner();
 
