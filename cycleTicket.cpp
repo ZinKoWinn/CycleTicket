@@ -11,45 +11,6 @@
 using namespace Ticket;
 using namespace std;
 
-void CycleTicket::mainMenu() {
-    CycleTicket cycleTicket;
-    int chosen;
-    do {
-        chosen = cycleTicket.welcome();
-        switch (chosen) {
-            case 1:
-                cycleTicket.generateTicketNumbers();
-                break;
-            case 2:
-                cycleTicket.showAvailableTickets();
-                break;
-            case 3:
-                cycleTicket.buyTicket();
-                break;
-            case 4:
-                cycleTicket.showTicketSaleDetails();
-                break;
-            case 5:
-                cycleTicket.ticketWinner();
-                break;
-        }
-    } while (chosen != 6);
-}
-
-int CycleTicket::welcome() {
-    int option = 0;
-    cout << "WELCOME FROM CYCLE TICKET SALE" << endl;
-    cout << "===========================================" << endl;
-    cout << "1. GENERATE TICKET NUMBERS" << endl;
-    cout << "2. SHOW AVAILABLE TICKETS" << endl;
-    cout << "3. BUY TICKET" << endl;
-    cout << "4. SHOW SALE DETAILS" << endl;
-    cout << "5. TICKET WINNER" << endl;
-    cout << "6. Quit" << endl;
-    cin >> option;
-    return option;
-}
-
 void CycleTicket::generateTicketNumbers() {
     fstream file;
     fstream tmpFile;
@@ -61,10 +22,10 @@ void CycleTicket::generateTicketNumbers() {
         exit(1);
     }
 
-    string ticketNumber = "";
+    string ticketNumber;
     for (int i = 1; i <= 1000; i++) {
         stringstream ss;
-        ss << std::setw(4) << std::setfill('0') << i;
+        ss << setw(4) << setfill('0') << i;
         if (i % 20 == 0) {
             ticketNumber = ss.str() + " \n";
         } else {
@@ -93,8 +54,8 @@ void CycleTicket::showAvailableTickets() {
         printf("File opening error");
         exit(1);
     }
-    string ticketNumber = "";
-    string tempTicketNumber = "";
+    string ticketNumber;
+    string tempTicketNumber;
     int index = 1;
     while (!file.eof()) {
         file >> tempTicketNumber;
@@ -110,39 +71,18 @@ void CycleTicket::showAvailableTickets() {
     file.close();
 }
 
-int CycleTicket::isAvailableTicketNumber(string ticketNumber) {
-    fstream file;
-    int ticketNumberIndex = 1;
-    file.open("available_tickets.txt", ios::in);
-
-    if (!file.is_open()) {
-        printf("File opening error");
-        exit(1);
-    }
-    string tempTicketNumber = "";
-    while (!file.eof()) {
-        file >> tempTicketNumber;
-        if (tempTicketNumber == ticketNumber) {
-            return ticketNumberIndex;
-        }
-        ticketNumberIndex++;
-    }
-    file.close();
-    return -1;
-}
-
-void CycleTicket::buyTicket() {
+int CycleTicket::buyTicket() {
     TicketSaleDetail ticketSaleDetail;
-    string tempTicketNumber = "";
-    string ticketNumberIndex = "";
+    string tempTicketNumber;
+    string ticketNumberIndex;
     int ticketCount = 0;
     string isValidTicketNumbers;
     do {
         cout << "Enter ticket number : ";
         cin >> ticketSaleDetail.ticketNumbers;
-        if (ticketSaleDetail.ticketNumbers == "" || ticketSaleDetail.ticketNumbers.length() < 4) {
+        if (ticketSaleDetail.ticketNumbers.empty() || ticketSaleDetail.ticketNumbers.length() < 4) {
             cout << endl << "Invalid ticket number. Please check available ticket number." << endl << endl;
-            mainMenu();
+            return -1;
         } else {
             for (auto &ch: ticketSaleDetail.ticketNumbers + ",") {
                 if (ch == ',') {
@@ -162,12 +102,12 @@ void CycleTicket::buyTicket() {
                 }
             }
         }
-    } while (ticketSaleDetail.ticketNumbers == "" || ticketSaleDetail.ticketNumbers.length() < 4);
+    } while (ticketSaleDetail.ticketNumbers.empty() || ticketSaleDetail.ticketNumbers.length() < 4);
 
     replaceAll(isValidTicketNumbers, "1", "");
     int totalPrice = TICKET_PRICE * ticketCount;
 
-    if (isValidTicketNumbers == "") {
+    if (isValidTicketNumbers.empty()) {
         cout << endl;
         cout << "Enter Name : ";
         cin >> ticketSaleDetail.name;
@@ -201,87 +141,7 @@ void CycleTicket::buyTicket() {
     } else {
         cout << ticketSaleDetail.ticketNumbers + " contain invalid lucky number. Please try again!" << endl << endl;
     }
-}
-
-void CycleTicket::updateAvailableTicket(string ticketNumbers) {
-    if (ticketNumbers != "") {
-        fstream file, tmpFile;
-        file.open("available_tickets.txt", ios::in);
-        tmpFile.open("temp.txt", ios::app);
-
-        if (!file.is_open() || !tmpFile.is_open()) {
-            printf("File opening error");
-            exit(1);
-        }
-
-        string ticketNumberIndex = "";
-        string ticketNumber;
-        string isTicketFound = "";
-        int index = 1;
-
-        while (!file.eof()) {
-            file >> ticketNumber;
-            for (auto &ch: ticketNumbers + ",") {
-                if (ch == ',') {
-                    if (to_string(index) == ticketNumberIndex) {
-                        isTicketFound += "1";
-                        if (index % 20 == 0) {
-                            tmpFile << "----  \n";
-                        } else {
-                            tmpFile << "---- ";
-                        }
-                    }
-                    ticketNumberIndex = "";
-                } else {
-                    string st(1, ch);
-                    ticketNumberIndex += st;
-                }
-            }
-
-            if (isTicketFound == "") {
-                if (index % 20 == 0) {
-                    tmpFile << ticketNumber + "  \n";
-                } else {
-                    tmpFile << ticketNumber + " ";
-                }
-            }
-            isTicketFound = "";
-            ticketNumber = "";
-            index++;
-        }
-
-        file.close();
-        tmpFile.close();
-        remove("available_tickets.txt");
-        rename("temp.txt", "available_tickets.txt");
-    }
-}
-
-void CycleTicket::save(TicketSaleDetail saleDetail) {
-    fstream file;
-    file.open("ticket_sale_detail.txt", ios::app);
-
-    if (!file.is_open()) {
-        printf("File opening error");
-        exit(1);
-    }
-
-    file << saleDetail.name << ' ' << saleDetail.phoneNumber << ' ' << saleDetail.address << ' '
-         << saleDetail.ticketNumbers << ' ' << saleDetail.fees << '\n';
-
-
-    cout << "Ticket sale detail added successfully" << endl << endl;
-    file.close();
-}
-
-void CycleTicket::replaceAll(string &str, const string &oldValue, const string &newValue) {
-    if (oldValue.empty())
-        return;
-    size_t startPosition = 0;
-    while ((startPosition = str.find(oldValue, startPosition)) != std::string::npos) {
-        str.replace(startPosition, oldValue.length(), newValue);
-        startPosition += newValue.length();
-    }
+    return 1;
 }
 
 void CycleTicket::showTicketSaleDetails() {
@@ -303,10 +163,10 @@ void CycleTicket::showTicketSaleDetails() {
         file >> ticketSaleDetail.name >> ticketSaleDetail.phoneNumber >> ticketSaleDetail.address
              >> ticketSaleDetail.ticketNumbers >> ticketSaleDetail.fees;
 
-        ticketSaleDetailPtr = ticketSaleDetail.name == "" ? NULL : &ticketSaleDetail;
+        ticketSaleDetailPtr = ticketSaleDetail.name.empty() ? NULL : &ticketSaleDetail;
 
         if (ticketSaleDetailPtr != NULL) {
-            if (ticketSaleDetail.name == "") {
+            if (ticketSaleDetail.name.empty()) {
                 cout << "There is no sale detail data." << endl << endl;
             } else {
                 showData(*ticketSaleDetailPtr);
@@ -322,8 +182,34 @@ void CycleTicket::showTicketSaleDetails() {
     file.close();
 }
 
-TicketSaleDetail *CycleTicket::findTicketOwner(string ticketNumber) {
-    if (ticketNumber != "") {
+void CycleTicket::ticketWinner() {
+    cout << "***********************" << endl;
+    cout << "TICKET WINNER" << endl;
+    cout << "***********************" << endl << endl;
+
+    string ticketNumber;
+    cout << "Enter ticket number : ";
+    cin >> ticketNumber;
+    TicketSaleDetail *ticketSaleDetail = findTicketOwner(ticketNumber);
+    if (ticketSaleDetail != NULL) {
+        showData(*ticketSaleDetail);
+    } else {
+        cout << "There is no ticket winner." << endl << endl;
+    }
+}
+
+void CycleTicket::replaceAll(string &str, const string &oldValue, const string &newValue) {
+    if (oldValue.empty())
+        return;
+    size_t startPosition = 0;
+    while ((startPosition = str.find(oldValue, startPosition)) != string::npos) {
+        str.replace(startPosition, oldValue.length(), newValue);
+        startPosition += newValue.length();
+    }
+}
+
+TicketSaleDetail *CycleTicket::findTicketOwner(const string &ticketNumber) {
+    if (!ticketNumber.empty()) {
         TicketSaleDetail ticketSaleDetail;
         fstream file;
         file.open("ticket_sale_detail.txt", ios::in);
@@ -332,7 +218,7 @@ TicketSaleDetail *CycleTicket::findTicketOwner(string ticketNumber) {
             printf("File opening error");
             exit(1);
         }
-        string tempTicketNumber = "";
+        string tempTicketNumber;
 
         while (!file.eof()) {
             file >> ticketSaleDetail.name >> ticketSaleDetail.phoneNumber >> ticketSaleDetail.address
@@ -355,23 +241,99 @@ TicketSaleDetail *CycleTicket::findTicketOwner(string ticketNumber) {
     return NULL;
 }
 
-void CycleTicket::ticketWinner() {
-    cout << "***********************" << endl;
-    cout << "TICKET WINNER" << endl;
-    cout << "***********************" << endl << endl;
+int CycleTicket::isAvailableTicketNumber(const string &ticketNumber) {
+    fstream file;
+    int ticketNumberIndex = 1;
+    file.open("available_tickets.txt", ios::in);
 
-    string ticketNumber = "";
-    cout << "Enter ticket number : ";
-    cin >> ticketNumber;
-    TicketSaleDetail *ticketSaleDetail = findTicketOwner(ticketNumber);
-    if (ticketSaleDetail != NULL) {
-        showData(*ticketSaleDetail);
-    } else {
-        cout << "There is no ticket winner." << endl << endl;
+    if (!file.is_open()) {
+        printf("File opening error");
+        exit(1);
+    }
+    string tempTicketNumber;
+    while (!file.eof()) {
+        file >> tempTicketNumber;
+        if (tempTicketNumber == ticketNumber) {
+            return ticketNumberIndex;
+        }
+        ticketNumberIndex++;
+    }
+    file.close();
+    return -1;
+}
+
+void CycleTicket::save(const TicketSaleDetail &saleDetail) {
+    fstream file;
+    file.open("ticket_sale_detail.txt", ios::app);
+
+    if (!file.is_open()) {
+        printf("File opening error");
+        exit(1);
+    }
+
+    file << saleDetail.name << ' ' << saleDetail.phoneNumber << ' ' << saleDetail.address << ' '
+         << saleDetail.ticketNumbers << ' ' << saleDetail.fees << '\n';
+
+
+    cout << endl << "Ticket sale detail added successfully" << endl << endl;
+    file.close();
+}
+
+void CycleTicket::updateAvailableTicket(const string &ticketNumbers) {
+    if (!ticketNumbers.empty()) {
+        fstream file, tmpFile;
+        file.open("available_tickets.txt", ios::in);
+        tmpFile.open("temp.txt", ios::app);
+
+        if (!file.is_open() || !tmpFile.is_open()) {
+            printf("File opening error");
+            exit(1);
+        }
+
+        string ticketNumberIndex;
+        string ticketNumber;
+        string isTicketFound;
+        int index = 1;
+
+        while (!file.eof()) {
+            file >> ticketNumber;
+            for (auto &ch: ticketNumbers + ",") {
+                if (ch == ',') {
+                    if (to_string(index) == ticketNumberIndex) {
+                        isTicketFound += "1";
+                        if (index % 20 == 0) {
+                            tmpFile << "----  \n";
+                        } else {
+                            tmpFile << "---- ";
+                        }
+                    }
+                    ticketNumberIndex = "";
+                } else {
+                    string st(1, ch);
+                    ticketNumberIndex += st;
+                }
+            }
+
+            if (isTicketFound.empty()) {
+                if (index % 20 == 0) {
+                    tmpFile << ticketNumber + "  \n";
+                } else {
+                    tmpFile << ticketNumber + " ";
+                }
+            }
+            isTicketFound = "";
+            ticketNumber = "";
+            index++;
+        }
+
+        file.close();
+        tmpFile.close();
+        remove("available_tickets.txt");
+        rename("temp.txt", "available_tickets.txt");
     }
 }
 
-void CycleTicket::showData(TicketSaleDetail ticketSaleDetail) {
+void CycleTicket::showData(const TicketSaleDetail &ticketSaleDetail) {
     cout << endl;
     cout << "Name : " << ticketSaleDetail.name << endl;
     cout << "Phone Number : " << ticketSaleDetail.phoneNumber << endl;

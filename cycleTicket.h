@@ -17,30 +17,27 @@ struct TicketSaleDetail {
 namespace Ticket {
     class CycleTicket {
     public:
-        void mainMenu();
+        static void generateTicketNumbers();
 
-        int welcome();
+        static void showAvailableTickets();
 
-        void generateTicketNumbers();
+        static int buyTicket();
 
-        void showAvailableTickets();
+        static void showTicketSaleDetails();
 
-        int isAvailableTicketNumber(std::string ticketNumber);
+        static void ticketWinner();
 
-        void buyTicket();
+    private:
+        static void replaceAll(std::string &str, const std::string &oldValue, const std::string &newValue);
 
-        void updateAvailableTicket(std::string ticketNumbers);
+        static TicketSaleDetail *findTicketOwner(const std::string &ticketNumber);
 
-        void replaceAll(std::string &str, const std::string &oldValue, const std::string &newValue);
+        static int isAvailableTicketNumber(const std::string &ticketNumber);
 
-        void save(TicketSaleDetail saleDetail);
+        static void save(const TicketSaleDetail &saleDetail);
 
-        void showTicketSaleDetails();
+        static void updateAvailableTicket(const std::string &ticketNumbers);
 
-        TicketSaleDetail *findTicketOwner(std::string ticketNumber);
-
-        void ticketWinner();
-
-        void showData(TicketSaleDetail ticketSaleDetail);
+        static void showData(const TicketSaleDetail &ticketSaleDetail);
     };
 }
