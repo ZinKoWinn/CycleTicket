@@ -17,7 +17,7 @@ struct TicketSaleDetail {
 namespace Ticket {
     class CycleTicket {
     public:
-        static void generateTicketNumbers();
+        static void generateTicketNumbers(int totalTicket);
 
         static void showAvailableTickets();
 

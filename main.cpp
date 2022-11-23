@@ -24,13 +24,20 @@ void mainMenu() {
         chosen = welcome();
         switch (chosen) {
             case 1:
-                cout << "Are you sure to regenerate ticket numbers?(y/n)" << endl;
-                cout << "Note : This action can not be restore after regenerate." << endl;
+                cout << "Are you sure to generate ticket numbers?(y/n)" << endl;
+                cout << "Note : If there is already generated tickets, this action can not be restore old ticket information." << endl;
                 cout << ">: ";
                 cin >> confirm;
                 cout << endl;
                 if (confirm == "y" || confirm == "Y") {
-                    CycleTicket::generateTicketNumbers();
+                    int totalTicket = 0;
+                    cout << "Enter total ticket : ";
+                    cin >> totalTicket;
+                    if (totalTicket > 0) {
+                        CycleTicket::generateTicketNumbers(totalTicket);
+                    } else {
+                        cout << "Total ticket number must be greater than zero" << endl << endl;
+                    }
                 }
                 break;
             case 2:

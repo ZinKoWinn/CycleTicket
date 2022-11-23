@@ -11,7 +11,7 @@
 using namespace Ticket;
 using namespace std;
 
-void CycleTicket::generateTicketNumbers() {
+void CycleTicket::generateTicketNumbers(int totalTicket) {
     fstream file;
     fstream tmpFile;
     file.open("available_tickets.txt", ios::app);
@@ -23,9 +23,11 @@ void CycleTicket::generateTicketNumbers() {
     }
 
     string ticketNumber;
-    for (int i = 1; i <= 1000; i++) {
+    int ticketNumberLength = to_string(totalTicket).length();
+    int ticketNumberFormat = ticketNumberLength < 3 ? 3 : ticketNumberLength;
+    for (int i = 1; i <= totalTicket; i++) {
         stringstream ss;
-        ss << setw(4) << setfill('0') << i;
+        ss << setw(ticketNumberFormat) << setfill('0') << i;
         if (i % 20 == 0) {
             ticketNumber = ss.str() + " \n";
         } else {
@@ -163,9 +165,9 @@ void CycleTicket::showTicketSaleDetails() {
         file >> ticketSaleDetail.name >> ticketSaleDetail.phoneNumber >> ticketSaleDetail.address
              >> ticketSaleDetail.ticketNumbers >> ticketSaleDetail.fees;
 
-        ticketSaleDetailPtr = ticketSaleDetail.name.empty() ? NULL : &ticketSaleDetail;
+        ticketSaleDetailPtr = ticketSaleDetail.name.empty() ? nullptr : &ticketSaleDetail;
 
-        if (ticketSaleDetailPtr != NULL) {
+        if (ticketSaleDetailPtr != nullptr) {
             if (ticketSaleDetail.name.empty()) {
                 cout << "There is no sale detail data." << endl << endl;
             } else {
@@ -191,7 +193,7 @@ void CycleTicket::ticketWinner() {
     cout << "Enter ticket number : ";
     cin >> ticketNumber;
     TicketSaleDetail *ticketSaleDetail = findTicketOwner(ticketNumber);
-    if (ticketSaleDetail != NULL) {
+    if (ticketSaleDetail != nullptr) {
         showData(*ticketSaleDetail);
     } else {
         cout << "There is no ticket winner." << endl << endl;
@@ -219,14 +221,14 @@ TicketSaleDetail *CycleTicket::findTicketOwner(const string &ticketNumber) {
             exit(1);
         }
         string tempTicketNumber;
-
         while (!file.eof()) {
             file >> ticketSaleDetail.name >> ticketSaleDetail.phoneNumber >> ticketSaleDetail.address
                  >> ticketSaleDetail.ticketNumbers >> ticketSaleDetail.fees;
             for (auto &ch: ticketSaleDetail.ticketNumbers + ",") {
                 if (ch == ',') {
                     if (tempTicketNumber == ticketNumber) {
-                        return &ticketSaleDetail;
+                        TicketSaleDetail *ticketSaleDetailPtr = &ticketSaleDetail;
+                        return ticketSaleDetailPtr;
                     }
                     tempTicketNumber = "";
                 } else {
@@ -234,11 +236,10 @@ TicketSaleDetail *CycleTicket::findTicketOwner(const string &ticketNumber) {
                     tempTicketNumber += st;
                 }
             }
-            cout << tempTicketNumber << endl;
         }
         file.close();
     }
-    return NULL;
+    return nullptr;
 }
 
 int CycleTicket::isAvailableTicketNumber(const string &ticketNumber) {
