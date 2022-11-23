@@ -82,7 +82,7 @@ int CycleTicket::buyTicket() {
     do {
         cout << "Enter ticket number : ";
         cin >> ticketSaleDetail.ticketNumbers;
-        if (ticketSaleDetail.ticketNumbers.empty() || ticketSaleDetail.ticketNumbers.length() < 4) {
+        if (ticketSaleDetail.ticketNumbers.empty() || ticketSaleDetail.ticketNumbers.length() < 3) {
             cout << endl << "Invalid ticket number. Please check available ticket number." << endl << endl;
             return -1;
         } else {
@@ -104,7 +104,7 @@ int CycleTicket::buyTicket() {
                 }
             }
         }
-    } while (ticketSaleDetail.ticketNumbers.empty() || ticketSaleDetail.ticketNumbers.length() < 4);
+    } while (ticketSaleDetail.ticketNumbers.empty() || ticketSaleDetail.ticketNumbers.length() < 3);
 
     replaceAll(isValidTicketNumbers, "1", "");
     int totalPrice = TICKET_PRICE * ticketCount;
@@ -303,9 +303,17 @@ void CycleTicket::updateAvailableTicket(const string &ticketNumbers) {
                     if (to_string(index) == ticketNumberIndex) {
                         isTicketFound += "1";
                         if (index % 20 == 0) {
-                            tmpFile << "----  \n";
+                          if(ticketNumber.length() > 3){
+                              tmpFile << "----  \n";
+                          }else{
+                              tmpFile << "---  \n";
+                          }
                         } else {
-                            tmpFile << "---- ";
+                            if(ticketNumber.length() > 3){
+                                tmpFile << "---- ";
+                            }else{
+                                tmpFile << "---  \n";
+                            }
                         }
                     }
                     ticketNumberIndex = "";
